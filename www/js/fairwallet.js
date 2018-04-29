@@ -461,18 +461,17 @@ var IterativeSolveSetup = function () {
 	var movementComparison = Infinity;
 	var preRandWalletList = copyArray(walletList);
     var preRandDenoms = copyArray(storeDenoms);
-			for (m=0; m<100; m++) {
+			for (m=0; m<1000; m++) {
 		copyBackWalletList(walletList,preRandWalletList);
 		copyBackWalletSingle(storeDenoms,preRandDenoms);
 		    IterativeSolve(walletList,storeDenoms);
-			debug.log(stepCount)
+			//console.log(stepCount)
 		        }
 
 	copyBackWalletList(walletList,finalConfig);
-	console.log(stepCount);
 };
 
-//Recursion Beginnings
+//Recursion Attempt - Not a confirmed working method
 var recursiveSolveSetup = function () {
 
 //Transfer all denominations to a temporary wallet.
