@@ -416,6 +416,7 @@ var State ={
 };
 //Iterative Beginnings (Unfinished/Untested as of 02/05/17)
 var IterativeSolveSetup = function () {
+			payToBank();
 //This is a "Random" solve, so not a true iteration through every possibility.
 
 //Transfer all denominations to a temporary wallet.
@@ -446,11 +447,13 @@ var IterativeSolveSetup = function () {
 		//After All bills are randomly assigned.
 		{
 			stepCount+=1;
-            //check if results lower than previous lowest. If so, we want to save that wallet configuration.
-            if (sumWalletDebtAbs(passedWalletList) <=remainderComparison &&  compareDenomCountList(passedWalletList,walletList)<=movementComparison ) {
-                remainderComparison=sumWalletDebtAbs(passedWalletList);  //Use the remainder comparison here as the final product.
-                movementComparison = compareDenomCountList(passedWalletList,walletList);
+            //check if absolute debts within wallets is lower than previous lowest. Also that making change doesn't lead to more bills than needed for the job. If so, we want to save that wallet configuration.
+			//Alas, this random movement means that the contents of your wallet get jumbled even if they don't solve the problem. IE you get traded two 5s for 1 10, even if it wasn't used to pay anything.
+            if (sumWalletDebtAbs(passedWalletList) <remainderComparison) {
+                console.log("Before   " + "  Remainder: " + remainderComparison +"  Step " + stepCount)
+				remainderComparison=sumWalletDebtAbs(passedWalletList);  //Use the remainder comparison here as the final product.
 				finalConfig = copyArray(passedWalletList);
+				console.log("After   " + "  Remainder: " + remainderComparison + "  Step " + stepCount)
             }
 
 		}
@@ -458,14 +461,13 @@ var IterativeSolveSetup = function () {
 	
     var stepCount = 0;
 	var remainderComparison = Infinity;
-	var movementComparison = Infinity;
 	var preRandWalletList = copyArray(walletList);
     var preRandDenoms = copyArray(storeDenoms);
 			for (m=0; m<1000; m++) {
+
 		copyBackWalletList(walletList,preRandWalletList);
 		copyBackWalletSingle(storeDenoms,preRandDenoms);
-		    IterativeSolve(walletList,storeDenoms);
-			//console.log(stepCount)
+		IterativeSolve(walletList,storeDenoms)
 		        }
 
 	copyBackWalletList(walletList,finalConfig);
@@ -473,7 +475,7 @@ var IterativeSolveSetup = function () {
 
 //Recursion Attempt - Not a confirmed working method
 var recursiveSolveSetup = function () {
-
+		payToBank();
 //Transfer all denominations to a temporary wallet.
 //Should have already transferred to bank first, so this is about minimizing the remaining moves.
 //Later I would like this to ignore some of the denominations that are transfered via the more efficient algorithm.
@@ -493,6 +495,7 @@ var recursiveSolveSetup = function () {
 
 //Getting twice the number of permutation values for some reason, need to check the code.
     var recursiveSolve = function (passedWalletList, passedDenominationsArray) {
+
         if (passedDenominationsArray.sumDenoms()>=1) {
             for (var i = 0; i < allDenominationsArray.length; i++) {
                 //See which denominations are left in the passed walletList
@@ -517,7 +520,7 @@ var recursiveSolveSetup = function () {
 			stepCount+=1;
             // IF there are no more denominations to move:
             //check if lower than previous lowest. If so, we want to save that wallet configuration.
-            if (sumWalletDebtAbs(passedWalletList) <=remainderComparison &&  compareDenomCountList(passedWalletList,walletList)<=movementComparison ) {
+            if (sumWalletDebtAbs(passedWalletList) <remainderComparison &&  compareDenomCountList(passedWalletList,walletList)<=movementComparison ) {
                 remainderComparison=sumWalletDebtAbs(passedWalletList);  //Use the remainder comparison here as the final product.
                 finalConfig = copyArray(passedWalletList);
             }
@@ -530,9 +533,8 @@ var recursiveSolveSetup = function () {
 	var movementComparison = Infinity;
     recursiveSolve(walletList,storeDenoms);
 	copyBackWalletList(walletList,finalConfig);
-	console.log(stepCount);
+	//console.log(stepCount);
 };
-
 
 //FIRST PASS -> Pay to Bank ONLY
 var payToBank = function () {
@@ -563,7 +565,6 @@ var payOverpaid = function () {
 	}
 };
 
-
 //THIRD PASS -> Positive Debt means they have not yet paid enough, give away denominations
 var payUnderpaid = function () {
 	sortDebtDescending(walletList);
@@ -586,22 +587,28 @@ var copyArray = function( toCopy ) {
 	return (copied);
 };
 
+var greedySolve = function () {
+	payToBank();
+	payOverpaid();
+	payUnderpaid();
+	//console.log("Traditional");
+}
+
 var mainAlgorithm = function () {
-payToBank();
+
 if (depthCount(walletList.length, sumWalletDenomCountList(walletList) ) <100000) {
 recursiveSolveSetup();
-console.log("Recursive");
+//console.log("Recursive");
 } else {
 	IterativeSolveSetup();
-//payOverpaid();
-//payUnderpaid();
-//console.log("Traditional");
+	//greedySolve();
+	console.log("Running Main")
 }
 };
 
 // MAKING CHANGE CODE
 var bankChangeMaker = function () {
-
+	
 	sortDebtDescending(walletList);  //By the time the wallets reach this point, the flexibility should have been used up if it could have anyway, so target the largest debts, which are indirectly the most inflexible.
 	for (var m=0; m<walletList.length; m++) { //Sending Wallets
 		if (walletList[m].debt>=1) {
@@ -683,7 +690,9 @@ var tipCycle = function () {
 copiedWalletList = copyArray(walletList); // Stores original composition of wallet
 copiedBank = copyArray(Bank); // Stores original composition of Bank
 
-var remainderComparison = Infinity;
+var walletRemainderComparison = Infinity;
+var bankRemainderComparison = Infinity;
+var movementComparison = Infinity;
 
 var bestWalletList = copyArray(walletList); //Stores best tip arrangement of wallets
 var bestBank = copyArray(Bank);
@@ -693,12 +702,28 @@ var bestBank = copyArray(Bank);
 		copyBackWalletList(walletList,copiedWalletList);
 		copyBackWalletSingle(Bank,copiedBank);
 		State.splitFairlyPercentage(workingTip);
-		mainAlgorithm();
-			if (sumWalletDebt(walletList)<remainderComparison && Bank.debt<1) {
+		
+		//We'll try and make change inside the tip loop. Otherwise we'll spend time trying to find the best tip, only to wreck all the work when we ultimately need to make change.
+		if (makeChange) {
+			mainAlgorithm();
+			var antiFreeze = 0;
+			while (bankChangeMaker() && antiFreeze<200) {
+				greedySolve();
+				antiFreeze = antiFreeze + 1;
+				console.log("Anti-Freeze :" + antiFreeze);
+				}
+		} else {
+			mainAlgorithm();
+		}
+		
+		//Previous method used bank.debt<1 which means there is nothing less than a penny left in the bank. Ideal, but not realistic for performance. Bank debt should already be as close to 0 as it can go anyways.
+			if (sumWalletDebt(walletList)<walletRemainderComparison && Bank.debt<bankRemainderComparison && compareDenomCountList(bestWalletList,walletList)<=movementComparison ) {
 			//console.log (workingTip);
 			copyBackWalletList(bestWalletList,walletList);
 			copyBackWalletSingle(bestBank,Bank);
-			remainderComparison=sumWalletDebt(walletList);
+			walletRemainderComparison=sumWalletDebt(walletList);
+			bankRemainderComparison = Bank.debt;
+			movementComparison = compareDenomCountList(bestWalletList,walletList);
 			}
 	}
 	
@@ -707,12 +732,7 @@ var bestBank = copyArray(Bank);
 	copyBackWalletList(walletList,bestWalletList);
 	copyBackWalletSingle(Bank,bestBank);
 	
-	if (makeChange) {
-		var antiFreeze = 0;
-		while (bankChangeMaker() && antiFreeze<20000) {
-			mainAlgorithm();
-			antiFreeze = antiFreeze + 1; }
-	}
+
 	
 //console.log('Lowest Working Tip ' + (lowestWorkingTip*scaleFactor).toFixed(2));
 };
@@ -1019,7 +1039,13 @@ var unevenSplitSteps = function () {
 		State.splitFairlyPercentage(taxPercentage); }
 };
 
-
+var testSuite = function () {
+	
+	firstRun()
+	
+	restartMethod()
+	
+}
 
 
 // OnClick and Load Events
