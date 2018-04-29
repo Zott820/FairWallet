@@ -450,10 +450,10 @@ var IterativeSolveSetup = function () {
             //check if absolute debts within wallets is lower than previous lowest. Also that making change doesn't lead to more bills than needed for the job. If so, we want to save that wallet configuration.
 			//Alas, this random movement means that the contents of your wallet get jumbled even if they don't solve the problem. IE you get traded two 5s for 1 10, even if it wasn't used to pay anything.
             if (sumWalletDebtAbs(passedWalletList) <remainderComparison) {
-                console.log("Before   " + "  Remainder: " + remainderComparison +"  Step " + stepCount)
+                //console.log("Before   " + "  Remainder: " + remainderComparison +"  Step " + stepCount)
 				remainderComparison=sumWalletDebtAbs(passedWalletList);  //Use the remainder comparison here as the final product.
 				finalConfig = copyArray(passedWalletList);
-				console.log("After   " + "  Remainder: " + remainderComparison + "  Step " + stepCount)
+				//console.log("After   " + "  Remainder: " + remainderComparison + "  Step " + stepCount)
             }
 
 		}
@@ -687,6 +687,7 @@ var changeRatiosBank = function (inputWallet, inputDenomination) {
 
 var tipCycle = function () {
 
+
 copiedWalletList = copyArray(walletList); // Stores original composition of wallet
 copiedBank = copyArray(Bank); // Stores original composition of Bank
 
@@ -707,8 +708,8 @@ var bestBank = copyArray(Bank);
 		if (makeChange) {
 			mainAlgorithm();
 			var antiFreeze = 0;
-			while (bankChangeMaker() && antiFreeze<200) {
-				greedySolve();
+			while (bankChangeMaker() && antiFreeze<20) {
+				mainAlgorithm(); //There is no need to run other expensive algorithmns because the bank will ALWAYS eventually allow you to pay off the debt.
 				antiFreeze = antiFreeze + 1;
 				console.log("Anti-Freeze :" + antiFreeze);
 				}
@@ -717,13 +718,15 @@ var bestBank = copyArray(Bank);
 		}
 		
 		//Previous method used bank.debt<1 which means there is nothing less than a penny left in the bank. Ideal, but not realistic for performance. Bank debt should already be as close to 0 as it can go anyways.
-			if (sumWalletDebt(walletList)<walletRemainderComparison && Bank.debt<bankRemainderComparison && compareDenomCountList(bestWalletList,walletList)<=movementComparison ) {
+			if (sumWalletDebtAbs(walletList)<walletRemainderComparison && Bank.debt<bankRemainderComparison && sumWalletDenomCountList(walletList)<=movementComparison ) {
 			//console.log (workingTip);
+			console.log("Before   " + "  Wallet Remainder: " + walletRemainderComparison +"  Bank Remainder " + bankRemainderComparison + "  Movement : " + movementComparison)
 			copyBackWalletList(bestWalletList,walletList);
 			copyBackWalletSingle(bestBank,Bank);
-			walletRemainderComparison=sumWalletDebt(walletList);
+			walletRemainderComparison=sumWalletDebtAbs(walletList);
 			bankRemainderComparison = Bank.debt;
-			movementComparison = compareDenomCountList(bestWalletList,walletList);
+			movementComparison = sumWalletDenomCountList(walletList);
+			console.log("After   " + "  Wallet Remainder: " + walletRemainderComparison +"  Bank Remainder " + bankRemainderComparison + "  Movement : " + movementComparison)
 			}
 	}
 	
