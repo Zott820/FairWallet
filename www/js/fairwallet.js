@@ -539,6 +539,7 @@ var recursiveSolveSetup = function () {
 //FIRST PASS -> Pay to Bank ONLY
 var payToBank = function () {
 // This chooses the wallet with the least 'flexibility' that is, the wallet with the fewest quantity of denominations to be first pick per each tier of denomination, though only if they have the item.
+//IE, if everybody has 20s to spare, take it from the guy who doesn't have any 10s next because they have fewer ways to pay off any high amount inequalities generated later. 
 	for (var i = 0; i < allDenominationsArray.length; i++) {
 		sortDenominationQuantityDescending(walletList,i+1); //Count only denominations/flexibility below current denomination level
 		for (var j=0; j<walletList.length; j++) {
@@ -687,6 +688,7 @@ var changeRatiosBank = function (inputWallet, inputDenomination) {
 
 var tipCycle = function () {
 
+//Hey, next time, let's explore matrix math instead of these different algorithmns. :) 04/29/2018
 
 copiedWalletList = copyArray(walletList); // Stores original composition of wallet
 copiedBank = copyArray(Bank); // Stores original composition of Bank
@@ -709,7 +711,7 @@ var bestBank = copyArray(Bank);
 			mainAlgorithm();
 			var antiFreeze = 0;
 			while (bankChangeMaker() && antiFreeze<20) {
-				mainAlgorithm(); //There is no need to run other expensive algorithmns because the bank will ALWAYS eventually allow you to pay off the debt.
+				greedySolve(); //There is no need to run other expensive algorithmns because the bank will ALWAYS eventually allow you to pay off the debt. The person doing the exchange may not be ideal though.
 				antiFreeze = antiFreeze + 1;
 				console.log("Anti-Freeze :" + antiFreeze);
 				}
