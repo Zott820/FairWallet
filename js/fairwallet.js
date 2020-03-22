@@ -1055,13 +1055,13 @@ var testSuite = function () {
 
 // OnClick and Load Events
 
-$( document ).on("pageshow", "#individualDebts", function() {
+$( document ).delegate("#individualDebts", "pageshow", function() {
     redrawGuiTax(); });
 
-$( document ).on("pageshow", "#fillWallets",  function() {
+$( document ).delegate("#fillWallets", "pageshow", function() {
      redrawGUI(); });
 
-$( document ).on("pageshow", "#results",  function() {
+$( document ).delegate("#results", "pageshow", function() {
     firstRun(); });
 	
 	
