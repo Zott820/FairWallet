@@ -7,8 +7,7 @@
   <link href="css/jquery.mobile-1.4.5.min.css" rel="stylesheet">
   <link href="css/jquery.mobile.icons.min.css" rel="stylesheet">
   <link href="css/jquery.mobile.structure-1.4.5.min.css" rel="stylesheet">
-  <script src="js/jquery-1.11.3.min.js">
-  </script>
+	<script src="js/jquery-2.2.4.min.js"></script>
   <script>
     //Fix for Chrome
     $(document).bind('mobileinit',function(){
@@ -282,7 +281,7 @@
           </div>
         </div>
         <div class="ui-field-contain">
-          <input id="debtReporting" name="debtReporting" type="text" width=
+          <input id="debtReporting" name="debtReporting" type="number" width=
           "50%">
         </div>
         <hr>
@@ -339,25 +338,29 @@
 	<div>
 	
 	<div id="element4">
-        Upper Tip Range: <input data-mini="true" id="upperTip" name=
-        "upperTipInput" type="number" value="0">
-		Lower Tip Range:
+        Tip Range: Low-High
         <input data-mini="true" id="lowerTip" name="lowerTipInput" type=
-        "number" value="0">
-	</div>
-	
-	<div>
-	  <button data-inline="true" data-mini="true" data-theme="e" id=
-      "makeChangeCheckbox">Make Change is OFF</button>
-	</div>
-	<div>
-      <button data-inline="true" data-mini="true" data-theme="e" id=
-      "displayButton">Showing Trades</button>
-	</div>
-	
-	  <div id="tip" style="text-align:center;font-size:150%">
+        "number" value="0" width="25%" float="left">
+		<input data-mini="true" id="upperTip" name=
+        "upperTipInput" type="number" value="0"width="25%" float="left">
+
+		<div id="tip" style="text-align:center;font-size:150%">
           Tip Result:
 	</div>
+	</div>
+	
+	<div id="element4">
+		<div>
+		  <button data-inline="true" data-mini="true" data-theme="e" id=
+		  "makeChangeCheckbox">Make Change is OFF</button>
+		</div>
+		<div>
+		  <button data-inline="true" data-mini="true" data-theme="e" id=
+		  "displayButton">Showing Trades</button>
+		</div>
+	</div>
+	
+
 	  
 	  </div>
 
