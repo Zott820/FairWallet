@@ -476,10 +476,10 @@ var IterativeSolveSetup = function () {
 //Recursion Attempt - Not a confirmed working method
 var recursiveSolveSetup = function () {
 		payToBank();
+		
 //Transfer all denominations to a temporary wallet.
 //Should have already transferred to bank first, so this is about minimizing the remaining moves.
 //Later I would like this to ignore some of the denominations that are transfered via the more efficient algorithm.
-
     var storeDenoms = new Wallet("storeDenoms");
 	var finalConfig = copyArray(walletList); // Stores original composition of wallet
     //Original walletList already should be backed up, so can free mess with the wallet contents before each backup.
@@ -493,25 +493,33 @@ var recursiveSolveSetup = function () {
     }
     //All denominations have been transferred to the storageWallet.
 
-//Getting twice the number of permutation values for some reason, need to check the code.
-    var recursiveSolve = function (passedWalletList, passedDenominationsArray) {
-
+// The issue with this recursion is it does more work than required.
+//For example, in a 3x2 situation, there are only 9 unique outcomes, but all orders are tested, so it actually does 18 calculations
+// That depend on which denomination was chosen first to work with.
+//Try and work out the chain symmetry so we can avoid doing extra recursive steps. Or finish the iterative method.
+    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level,currDenom) {
+		var symmetry = false
         if (passedDenominationsArray.sumDenoms()>=1) {
-            for (var i = 0; i < allDenominationsArray.length; i++) {
+            for (var i = currDenom; i < allDenominationsArray.length; i++) {
                 //See which denominations are left in the passed walletList
                 if (passedDenominationsArray.denominations[i].quantity>0) {
+					if (symmetry == false) {
+						var copiedrecursWalletList = copyArray(passedWalletList);
+						var copiedDenoms = copyArray(passedDenominationsArray);
 
-                    var copiedrecursWalletList = copyArray(passedWalletList);
-                    var copiedDenoms = copyArray(passedDenominationsArray);
-
-                    //Save the wallet list as it exists at this point into temporary variables.
-                    for (var m=0; m<passedWalletList.length; m++) {
-                        //move down the chain, and restore previous wallet list config, move denomination into position +1
-                        transferDenomination(passedDenominationsArray, passedWalletList[m], allDenominationsArray[i]);
-                        recursiveSolve(passedWalletList,passedDenominationsArray);
-                        copyBackWalletList(passedWalletList,copiedrecursWalletList);
-                        copyBackWalletSingle(passedDenominationsArray,copiedDenoms)
-                    }
+						//Save the wallet list as it exists at this point into temporary variables.
+						for (var m=0; m<passedWalletList.length; m++) {
+							//move down the chain, and restore previous wallet list config, move denomination into position +1
+							transferDenomination(passedDenominationsArray, passedWalletList[m], allDenominationsArray[i]);
+							recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
+							copyBackWalletList(passedWalletList,copiedrecursWalletList);
+							copyBackWalletSingle(passedDenominationsArray,copiedDenoms)
+							console.log("Level Count: " + level);
+							if (level==0) {
+								symmetry = true
+							}
+						}
+					}
                 }
 
                 //Save denominations list
@@ -531,9 +539,9 @@ var recursiveSolveSetup = function () {
     var stepCount = 0;
 	var remainderComparison = Infinity;
 	var movementComparison = Infinity;
-    recursiveSolve(walletList,storeDenoms);
+    recursiveSolve(walletList,storeDenoms, 0,0);
 	copyBackWalletList(walletList,finalConfig);
-	//console.log(stepCount);
+	console.log("Step Count: " + stepCount);
 };
 
 //FIRST PASS -> Pay to Bank ONLY
@@ -596,14 +604,16 @@ var greedySolve = function () {
 }
 
 var mainAlgorithm = function () {
-
-if (depthCount(walletList.length, sumWalletDenomCountList(walletList) ) <100000) {
+if (true) {
+//if (depthCount(walletList.length, sumWalletDenomCountList(walletList) ) <500000) {
 recursiveSolveSetup();
-//console.log("Recursive");
+console.log("Recursive");
+//console.log(depthCount(walletList.length, sumWalletDenomCountList(walletList))); 
 } else {
 	IterativeSolveSetup();
 	//greedySolve();
 	console.log("Running Main")
+	//console.log(depthCount(walletList.length, sumWalletDenomCountList(walletList))); 
 }
 };
 
@@ -807,23 +817,22 @@ sortWalletOwner(copiedWalletList);
 printTable();
 };
 
+//This depth count doesn't count correctly. It may count what it does now, but not what it should be. IE 4 bills in one wallet should only be 1 way possible, not 24.
 var depthCount = function(a,n) {
-var tempStorage;
-var recursive = function(a,n,last,count) {
-
-if (n<=0) {
-return 0;
-}
-var next = a*(count+1)*last;
-count+=1;
-if (count<n) {
-recursive(a,n,next,count);
-} else 
-{tempStorage=next;}
-
-};
-recursive(a,n,1,0);
-return tempStorage ;
+	var tempStorage;
+	var recursive = function(a,n,last,count) {
+		if (n<=0) {
+			return 0;
+		}
+		var next = a*(count+1)*last;
+		count+=1;
+		if (count<n) {
+			recursive(a,n,next,count);
+		} else 
+			{tempStorage=next;}
+	};
+	recursive(a,n,1,0);
+	return tempStorage ;
 
 };
 	
