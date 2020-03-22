@@ -74,7 +74,7 @@ var clickPicture = function (denominationUnit, action) {
 var editWalletName = function () {
 	var selected = document.getElementById("walletSelect").selectedIndex;
 	
-	value = prompt("Edit Wallet Name", walletList[selected].walletOwner );
+	value = prompt("Edit Person's Name", walletList[selected].walletOwner );
     if( value && value != bankName ){
         walletList[selected].walletOwner = value;
         redrawGUI();    
@@ -85,7 +85,7 @@ var createAndDestroyWallets = function (walletMatrix, action) {
 	var selectionElement= document.getElementById("walletSelect"); //Change this as needed
 
 		if (action == 'add') {
-			var capturedName = prompt("Enter Wallet Name:"); //Change this as needed
+			var capturedName = prompt("Enter Person's Name:"); //Change this as needed
 			if( capturedName ){
 			
 				walletMatrix.push(new Wallet(capturedName));
@@ -864,7 +864,7 @@ var printTable = function () {
 		var wallet=walletList[element];
 		var initialWallet = copiedWalletList[element];
         walletColumnGen(wallet,initialWallet); }
-	document.getElementById('tip').innerHTML = 'Working Tip ' + (lowestWorkingTip*scaleFactor).toFixed(2) + '%'; 
+	document.getElementById('tip').innerHTML = 'Calculated Optimal Tip ' + (lowestWorkingTip*scaleFactor).toFixed(2) + '%'; 
 	
 	$.mobile.loading('hide');
 	$("#calculating").hide();
