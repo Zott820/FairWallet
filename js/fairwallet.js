@@ -1075,29 +1075,29 @@ $( document ).on("pageshow", "#results",  function() {
 	
 	
 	//Wallet Contents - OnClick Events
-	$('#walletSelect').change(function(){redrawGUI();});
+	$('#walletSelect').change(function(){redrawGUI(); navigator.vibrate(200);});
 		
-	$('#addPerson').click(function(){createAndDestroyWallets(walletList,'add');});
-	$('#editPerson').click(function(){editWalletName();});
-	$('#deletePerson').click(function(){createAndDestroyWallets(walletList,'subt');});
+	$('#addPerson').click(function(){createAndDestroyWallets(walletList,'add'); navigator.vibrate(200);});
+	$('#editPerson').click(function(){editWalletName(); navigator.vibrate(200);});
+	$('#deletePerson').click(function(){createAndDestroyWallets(walletList,'subt'); navigator.vibrate(200);});
 	
-	$('#20subt').click(function(){clickPicture(quickTwenty,'subt');});
-	$('#20add').click(function(){clickPicture(quickTwenty,'add');});
-	$('#10subt').click(function(){clickPicture(quickTen,'subt');});
-	$('#10add').click(function(){clickPicture(quickTen,'add');});
-	$('#5subt').click(function(){clickPicture(quickFive,'subt');});
-	$('#5add').click(function(){clickPicture(quickFive,'add');});
-	$('#1subt').click(function(){clickPicture(quickOne,'subt');});
-	$('#1add').click(function(){clickPicture(quickOne,'add');});
+	$('#20subt').click(function(){clickPicture(quickTwenty,'subt'); navigator.vibrate(200);});
+	$('#20add').click(function(){clickPicture(quickTwenty,'add'); navigator.vibrate(200);});
+	$('#10subt').click(function(){clickPicture(quickTen,'subt'); navigator.vibrate(200);});
+	$('#10add').click(function(){clickPicture(quickTen,'add'); navigator.vibrate(200);});
+	$('#5subt').click(function(){clickPicture(quickFive,'subt'); navigator.vibrate(200);});
+	$('#5add').click(function(){clickPicture(quickFive,'add'); navigator.vibrate(200);});
+	$('#1subt').click(function(){clickPicture(quickOne,'subt'); navigator.vibrate(200);});
+	$('#1add').click(function(){clickPicture(quickOne,'add'); navigator.vibrate(200);});
 	
-	$('#25csubt').click(function(){clickPicture(quickQuarter,'subt');});
-	$('#25cadd').click(function(){clickPicture(quickQuarter,'add');});
-	$('#10csubt').click(function(){clickPicture(quickDime,'subt');});
-	$('#10cadd').click(function(){clickPicture(quickDime,'add');});
-	$('#5csubt').click(function(){clickPicture(quickNickel,'subt');});
-	$('#5cadd').click(function(){clickPicture(quickNickel,'add');});
-	$('#1csubt').click(function(){clickPicture(quickPenny,'subt');});
-	$('#1cadd').click(function(){clickPicture(quickPenny,'add');});
+	$('#25csubt').click(function(){clickPicture(quickQuarter,'subt'); navigator.vibrate(200);});
+	$('#25cadd').click(function(){clickPicture(quickQuarter,'add'); navigator.vibrate(200);});
+	$('#10csubt').click(function(){clickPicture(quickDime,'subt'); navigator.vibrate(200);});
+	$('#10cadd').click(function(){clickPicture(quickDime,'add'); navigator.vibrate(200);});
+	$('#5csubt').click(function(){clickPicture(quickNickel,'subt'); navigator.vibrate(200);});
+	$('#5cadd').click(function(){clickPicture(quickNickel,'add'); navigator.vibrate(200);});
+	$('#1csubt').click(function(){clickPicture(quickPenny,'subt'); navigator.vibrate(200);});
+	$('#1cadd').click(function(){clickPicture(quickPenny,'add'); navigator.vibrate(200);});
 	
 	//Payment Type and Tax - OnClick Events
 	$('#totalNoTax, #taxOnly').change(function(){calculateTaxPercentage();});
@@ -1119,6 +1119,7 @@ window.onload=function() {
 				document.getElementById("equalResultsGoBack").style.display = "none";
 				splitEquallyBool = false;
 				}
+			navigator.vibrate(200);
 			};
 			document.getElementById("radio-choice-2").onchange = function ChangeDropdowns() { //Equal Split
 				if(this.checked == true) {
@@ -1132,18 +1133,19 @@ window.onload=function() {
 				document.getElementById("equalResultsGoBack").style.display = "block";
 				splitEquallyBool = true;
 				}
+			navigator.vibrate(200);
 			};
 
 };
 	
 	// Individual Debts - OnClick Events
-	$('#debtReporting').change(function(){adjustSlidersForDebt();});
-	$('#iterateBackwards').click(function(){iterateThroughWalletList('backward');});
-	$('#iterateForwards').click(function(){iterateThroughWalletList('forward');});
+	$('#debtReporting').change(function(){adjustSlidersForDebt(); navigator.vibrate(200);});
+	$('#iterateBackwards').click(function(){iterateThroughWalletList('backward');navigator.vibrate(200);});
+	$('#iterateForwards').click(function(){iterateThroughWalletList('forward');navigator.vibrate(200);});
 	
 	//Results - OnClick Events
-	$('#displayButton').click(function(){toggleTotals();});
-	$('#makeChangeCheckbox').click(function(){toggleChange();});
-	$('.restoreOrig').click(function(){restoreOriginalValues();});
-	$('.recalculate').click(function(){restartMethod();});
+	$('#displayButton').click(function(){toggleTotals();navigator.vibrate(200);});
+	$('#makeChangeCheckbox').click(function(){toggleChange();navigator.vibrate(200);});
+	$('.restoreOrig').click(function(){restoreOriginalValues();navigator.vibrate(200);});
+	$('.recalculate').click(function(){restartMethod();navigator.vibrate(200);});
 	
