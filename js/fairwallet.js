@@ -1075,29 +1075,39 @@ $( document ).on("pageshow", "#results",  function() {
 	
 	
 	//Wallet Contents - OnClick Events
-	$('#walletSelect').change(function(){redrawGUI(); navigator.vibrate(200);});
+	$('#walletSelect').change(function(){navigator.vibrate(100); redrawGUI(); });
 		
-	$('#addPerson').click(function(){createAndDestroyWallets(walletList,'add'); navigator.vibrate(200);});
-	$('#editPerson').click(function(){editWalletName(); navigator.vibrate(200);});
-	$('#deletePerson').click(function(){createAndDestroyWallets(walletList,'subt'); navigator.vibrate(200);});
+	$('#addPerson').click(function(){navigator.vibrate(100); createAndDestroyWallets(walletList,'add'); });
+	$('#editPerson').click(function(){navigator.vibrate(100); editWalletName(); });
+	$('#deletePerson').click(function(){navigator.vibrate(100); createAndDestroyWallets(walletList,'subt'); });
 	
-	$('#20subt').click(function(){clickPicture(quickTwenty,'subt'); navigator.vibrate(200);});
-	$('#20add').click(function(){clickPicture(quickTwenty,'add'); navigator.vibrate(200);});
-	$('#10subt').click(function(){clickPicture(quickTen,'subt'); navigator.vibrate(200);});
-	$('#10add').click(function(){clickPicture(quickTen,'add'); navigator.vibrate(200);});
-	$('#5subt').click(function(){clickPicture(quickFive,'subt'); navigator.vibrate(200);});
-	$('#5add').click(function(){clickPicture(quickFive,'add'); navigator.vibrate(200);});
-	$('#1subt').click(function(){clickPicture(quickOne,'subt'); navigator.vibrate(200);});
-	$('#1add').click(function(){clickPicture(quickOne,'add'); navigator.vibrate(200);});
+	$('#20subt').click(function(){navigator.vibrate(100);  clickPicture(quickTwenty,'subt'); });
+	$('#20add').click(function(){navigator.vibrate(100); clickPicture(quickTwenty,'add'); });
+	$('#10subt').click(function(){navigator.vibrate(100); clickPicture(quickTen,'subt'); });
+	$('#10add').click(function(){navigator.vibrate(100); clickPicture(quickTen,'add'); });
+	$('#5subt').click(function(){navigator.vibrate(100); clickPicture(quickFive,'subt'); });
+	$('#5add').click(function(){navigator.vibrate(100); clickPicture(quickFive,'add'); });
+	$('#1subt').click(function(){navigator.vibrate(100); clickPicture(quickOne,'subt'); });
+	$('#1add').click(function(){ navigator.vibrate(100); clickPicture(quickOne,'add');});
 	
-	$('#25csubt').click(function(){clickPicture(quickQuarter,'subt'); navigator.vibrate(200);});
-	$('#25cadd').click(function(){clickPicture(quickQuarter,'add'); navigator.vibrate(200);});
-	$('#10csubt').click(function(){clickPicture(quickDime,'subt'); navigator.vibrate(200);});
-	$('#10cadd').click(function(){clickPicture(quickDime,'add'); navigator.vibrate(200);});
-	$('#5csubt').click(function(){clickPicture(quickNickel,'subt'); navigator.vibrate(200);});
-	$('#5cadd').click(function(){clickPicture(quickNickel,'add'); navigator.vibrate(200);});
-	$('#1csubt').click(function(){clickPicture(quickPenny,'subt'); navigator.vibrate(200);});
-	$('#1cadd').click(function(){clickPicture(quickPenny,'add'); navigator.vibrate(200);});
+	$('#25csubt').click(function(){navigator.vibrate(100); clickPicture(quickQuarter,'subt'); });
+	$('#25cadd').click(function(){navigator.vibrate(100); clickPicture(quickQuarter,'add'); });
+	$('#10csubt').click(function(){navigator.vibrate(100); clickPicture(quickDime,'subt'); });
+	$('#10cadd').click(function(){navigator.vibrate(100); clickPicture(quickDime,'add'); });
+	$('#5csubt').click(function(){navigator.vibrate(100); clickPicture(quickNickel,'subt'); });
+	$('#5cadd').click(function(){navigator.vibrate(100); clickPicture(quickNickel,'add'); });
+	$('#1csubt').click(function(){navigator.vibrate(100); clickPicture(quickPenny,'subt'); });
+	$('#1cadd').click(function(){navigator.vibrate(100); clickPicture(quickPenny,'add'); });
+	
+	$('#Start').click(function(){navigator.vibrate(100);});
+	$('#equalResults').click(function(){navigator.vibrate(100);});
+	$('#individual').click(function(){navigator.vibrate(100);});
+	$('#Continue3').click(function(){navigator.vibrate(100);});
+	$('#GoBack1').click(function(){navigator.vibrate(100);});
+	$('#GoBack2').click(function(){navigator.vibrate(100);});
+	$('#GoBack3').click(function(){navigator.vibrate(100);});
+	$('#GoBack4').click(function(){navigator.vibrate(100);});
+	$('#GoBack5').click(function(){navigator.vibrate(100);});
 	
 	//Payment Type and Tax - OnClick Events
 	$('#totalNoTax, #taxOnly').change(function(){calculateTaxPercentage();});
@@ -1119,7 +1129,7 @@ window.onload=function() {
 				document.getElementById("equalResultsGoBack").style.display = "none";
 				splitEquallyBool = false;
 				}
-			navigator.vibrate(200);
+			navigator.vibrate(100);
 			};
 			document.getElementById("radio-choice-2").onchange = function ChangeDropdowns() { //Equal Split
 				if(this.checked == true) {
@@ -1133,19 +1143,19 @@ window.onload=function() {
 				document.getElementById("equalResultsGoBack").style.display = "block";
 				splitEquallyBool = true;
 				}
-			navigator.vibrate(200);
+			navigator.vibrate(100);
 			};
 
 };
 	
 	// Individual Debts - OnClick Events
-	$('#debtReporting').change(function(){adjustSlidersForDebt(); navigator.vibrate(200);});
-	$('#iterateBackwards').click(function(){iterateThroughWalletList('backward');navigator.vibrate(200);});
-	$('#iterateForwards').click(function(){iterateThroughWalletList('forward');navigator.vibrate(200);});
+	$('#debtReporting').change(function(){navigator.vibrate(100); adjustSlidersForDebt(); });
+	$('#iterateBackwards').click(function(){navigator.vibrate(100); iterateThroughWalletList('backward');});
+	$('#iterateForwards').click(function(){navigator.vibrate(100); iterateThroughWalletList('forward');});
 	
 	//Results - OnClick Events
-	$('#displayButton').click(function(){toggleTotals();navigator.vibrate(200);});
-	$('#makeChangeCheckbox').click(function(){toggleChange();navigator.vibrate(200);});
-	$('.restoreOrig').click(function(){restoreOriginalValues();navigator.vibrate(200);});
-	$('.recalculate').click(function(){restartMethod();navigator.vibrate(200);});
+	$('#displayButton').click(function(){navigator.vibrate(100); toggleTotals();});
+	$('#makeChangeCheckbox').click(function(){navigator.vibrate(100); toggleChange();});
+	$('.restoreOrig').click(function(){navigator.vibrate(100); restoreOriginalValues();});
+	$('.recalculate').click(function(){navigator.vibrate(100); restartMethod();});
 	
