@@ -289,6 +289,25 @@ var transferDenomination = function (walletPay, walletRecieve, denominationUnit)
 	//console.log( walletRecieve.walletOwner + ' now has a debt of ' + walletRecieve.debt)
 };
 
+var walletsEqualDenom = function (walletList1,walletList2) {
+	//Check if two wallets have equivalent denomination contents. Does not compare debt, names or anything else.
+		
+    if(typeof walletList1 === 'undefined' || typeof walletList2 === 'undefined') {
+		return false
+	}
+	
+    if (walletList1.length == walletList2.length) {
+		for (var i = 0; i < allDenominationsArray.length; i++) {
+			if (walletList1.denominations[i].quantity != walletList2.denominations[i].quantity ) { 
+				return (false) 
+				}
+		}
+    return(true);
+	}
+	
+	//Default false if wallets not equal length
+	return (false)
+}
 
 var sumWalletDebt = function ( walletArray ) {
 var sum=0;
@@ -307,6 +326,7 @@ var sum=0;
 };
 
 var sumWalletDenomCountList = function ( walletArray ) {
+	//Given a wallet list, return the sum of all the denominations within it.
 var sum=0;
 	for ( var element in walletArray){
 		sum+= Math.abs( walletArray[element].sumDenoms() );
@@ -315,7 +335,7 @@ var sum=0;
 };
 
 var randomizeWalletDenoms = function ( walletArray ) {
-	
+	//Generate a Wallet with a random count of denominations in it.
 for (var i = 0; i < allDenominationsArray.length; i++) {
         for (var j = 0; j<walletArray.length; j++) {
 			for (var p =0; p<Math.floor( Math.random()*5 ); p++) {
@@ -326,6 +346,7 @@ for (var i = 0; i < allDenominationsArray.length; i++) {
 };
 
 var compareDenomCountList = function (walletList1,walletList2) {
+	//Compare if two wallets have the same total sum in them. Returns difference.
     //Lists need to be the same length
     var dist = Infinity
     if (walletList1.length==walletList2.length) {
@@ -438,7 +459,7 @@ var IterativeSolveSetup = function () {
     var IterativeSolve = function (passedWalletList, passedDenominationsArray) {
 		//Save the wallet list as it exists at this point into temporary variables.
 		for (var i = 0; i < allDenominationsArray.length; i++) {
-			//See which denominations are left in the passed walletList
+			//See which denominations are left in the passed walletList, then randomly assign
 			while (passedDenominationsArray.denominations[i].quantity>0) {
 				transferDenomination(passedDenominationsArray,  passedWalletList[Math.floor(Math.random()*passedWalletList.length)], allDenominationsArray[i]);
 			}
@@ -460,7 +481,7 @@ var IterativeSolveSetup = function () {
     };
 	
     var stepCount = 0;
-	var remainderComparison = Infinity;
+	var remainderComparison = sumWalletDebtAbs(walletList);
 	var preRandWalletList = copyArray(walletList);
     var preRandDenoms = copyArray(storeDenoms);
 			for (m=0; m<1000; m++) {
@@ -492,18 +513,30 @@ var recursiveSolveSetup = function () {
         }
     }
     //All denominations have been transferred to the storageWallet.
-
+	
+	//Array of wallets
+	treeStore = new Array();
+	var checkTreeDupe = function (walletToCompare) {
+		//Less unique denominations we're interested in are likely at the end
+		for (var i = treeStore.length -1; i >= 0; i--) { 
+			if  ( walletsEqualDenom(treeStore[i],walletToCompare) ) {
+			return (true)
+			}
+		}
+		//If not included in the tree, let's add it.
+		treeStore.push(copyArray(walletToCompare))
+		return (false)
+	}
+	
 // The issue with this recursion is it does more work than required.
 //For example, in a 3x2 situation, there are only 9 unique outcomes, but all orders are tested, so it actually does 18 calculations
 // That depend on which denomination was chosen first to work with.
 //Try and work out the chain symmetry so we can avoid doing extra recursive steps. Or finish the iterative method.
     var recursiveSolve = function (passedWalletList, passedDenominationsArray, level,currDenom) {
-		var symmetry = false
         if (passedDenominationsArray.sumDenoms()>=1) {
             for (var i = currDenom; i < allDenominationsArray.length; i++) {
                 //See which denominations are left in the passed walletList
                 if (passedDenominationsArray.denominations[i].quantity>0) {
-					if (symmetry == false) {
 						var copiedrecursWalletList = copyArray(passedWalletList);
 						var copiedDenoms = copyArray(passedDenominationsArray);
 
@@ -511,15 +544,13 @@ var recursiveSolveSetup = function () {
 						for (var m=0; m<passedWalletList.length; m++) {
 							//move down the chain, and restore previous wallet list config, move denomination into position +1
 							transferDenomination(passedDenominationsArray, passedWalletList[m], allDenominationsArray[i]);
-							recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
+							if (checkTreeDupe(passedDenominationsArray) ==false) {
+								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
+							}
 							copyBackWalletList(passedWalletList,copiedrecursWalletList);
 							copyBackWalletSingle(passedDenominationsArray,copiedDenoms)
 							console.log("Level Count: " + level);
-							if (level==0) {
-								symmetry = true
-							}
 						}
-					}
                 }
 
                 //Save denominations list
@@ -537,7 +568,7 @@ var recursiveSolveSetup = function () {
         }
     };
     var stepCount = 0;
-	var remainderComparison = Infinity;
+	var remainderComparison = sumWalletDebtAbs(walletList);
 	var movementComparison = Infinity;
     recursiveSolve(walletList,storeDenoms, 0,0);
 	copyBackWalletList(walletList,finalConfig);
