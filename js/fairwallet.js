@@ -531,7 +531,6 @@ var recursiveSolveSetup = function () {
 // The issue with this recursion is it does more work than required.
 //For example, in a 3x2 situation, there are only 9 unique outcomes, but all orders are tested, so it actually does 18 calculations
 // That depend on which denomination was chosen first to work with.
-//Try and work out the chain symmetry so we can avoid doing extra recursive steps. Or finish the iterative method.
     var recursiveSolve = function (passedWalletList, passedDenominationsArray, level,currDenom) {
         if (passedDenominationsArray.sumDenoms()>=1) {
             for (var i = currDenom; i < allDenominationsArray.length; i++) {
@@ -544,6 +543,8 @@ var recursiveSolveSetup = function () {
 						for (var m=0; m<passedWalletList.length; m++) {
 							//move down the chain, and restore previous wallet list config, move denomination into position +1
 							transferDenomination(passedDenominationsArray, passedWalletList[m], allDenominationsArray[i]);
+							//The assumptions here are wrong, because multiple branches will require denomination arrays that are equivalent.
+							//Will need to compare the WalletLists and bail if a WalletList is a duplicate. 10/19/20
 							if (checkTreeDupe(passedDenominationsArray) ==false) {
 								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
 							}
@@ -568,7 +569,7 @@ var recursiveSolveSetup = function () {
         }
     };
     var stepCount = 0;
-	var remainderComparison = sumWalletDebtAbs(walletList);
+	var remainderComparison = sumWalletDebtAbs(walletList); //Must be better than doing nothing
 	var movementComparison = Infinity;
     recursiveSolve(walletList,storeDenoms, 0,0);
 	copyBackWalletList(walletList,finalConfig);
