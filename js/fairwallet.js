@@ -516,6 +516,8 @@ var recursiveSolveSetup = function () {
 	
 	//Array of wallets
 	treeStore = new Array();
+	
+	
 	var checkTreeDupe = function (walletToCompare) {
 		//Less unique denominations we're interested in are likely at the end
 		for (var i = treeStore.length -1; i >= 0; i--) { 
@@ -525,6 +527,33 @@ var recursiveSolveSetup = function () {
 		}
 		//If not included in the tree, let's add it.
 		treeStore.push(copyArray(walletToCompare))
+		return (false)
+	}
+	
+	var checkTreeDupeList = function (walletListToCompare) {
+		//Less unique denominations we're interested in are likely at the end
+		for (var i = treeStore.length -1; i >= 0; i--) {
+			//Moving through wallet lists
+			for (var j = treeStore[i].length - 1; j >= 0; j--) {
+				//For each wallet in that wallet list
+				for (var k = walletListToCompare.length - 1; k >= 0; k--) {
+					//comparing against other wallet list
+					if (treeStore[i][j].walletOwner == walletListToCompare[k].walletOwner) {
+						if (treeStore[i][j].total == walletListToCompare[k].total) {
+						//Find the wallet with the same name
+						//If the total isn't the same, there are no same wallets
+							if ( walletsEqualDenom(treeStore[i][j],walletListToCompare[k]) == true ) {
+							//Let's compare the denominations inside the wallets.
+								return (true)
+							}
+						}
+					}
+				}	
+			}
+		}
+		
+		//If List not included in the tree, let's add it.
+		treeStore.push(copyArray(walletListToCompare))
 		return (false)
 	}
 	
@@ -545,7 +574,7 @@ var recursiveSolveSetup = function () {
 							transferDenomination(passedDenominationsArray, passedWalletList[m], allDenominationsArray[i]);
 							//The assumptions here are wrong, because multiple branches will require denomination arrays that are equivalent.
 							//Will need to compare the WalletLists and bail if a WalletList is a duplicate. 10/19/20
-							if (checkTreeDupe(passedDenominationsArray) ==false) {
+							if (checkTreeDupeList(passedWalletList) == false) {
 								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
 							}
 							copyBackWalletList(passedWalletList,copiedrecursWalletList);
