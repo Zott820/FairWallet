@@ -532,24 +532,31 @@ var recursiveSolveSetup = function () {
 	
 	var checkTreeDupeList = function (walletListToCompare) {
 		//Less unique denominations we're interested in are likely at the end
+
 		for (var i = treeStore.length -1; i >= 0; i--) {
-			//Moving through wallet lists
+			var equalBool = false;
+			//Moving through wallet lists. Check each set of wallets, against default not equal
+			nextList:
 			for (var j = treeStore[i].length - 1; j >= 0; j--) {
 				//For each wallet in that wallet list
 				for (var k = walletListToCompare.length - 1; k >= 0; k--) {
 					//comparing against other wallet list
 					if (treeStore[i][j].walletOwner == walletListToCompare[k].walletOwner) {
+						//Find the wallet with the same name, let's not compare the wrong wallets
 						if (treeStore[i][j].total == walletListToCompare[k].total) {
-						//Find the wallet with the same name
 						//If the total isn't the same, there are no same wallets
 							if ( walletsEqualDenom(treeStore[i][j],walletListToCompare[k]) == true ) {
 							//Let's compare the denominations inside the wallets.
-								return (true)
-							}
-						}
+								equalBool = true
+							} else {equalBool = false; break nextList } //Denom Check
+						} else {equalBool = false; break nextList} //Total Check
 					}
-				}	
-			}
+				}
+			//Did we make it through both wallets? It should cancel early otherwise
+			}	
+			if (equalBool == true) {
+				return(true)
+			}			
 		}
 		
 		//If List not included in the tree, let's add it.
@@ -562,7 +569,8 @@ var recursiveSolveSetup = function () {
 // That depend on which denomination was chosen first to work with.
     var recursiveSolve = function (passedWalletList, passedDenominationsArray, level,currDenom) {
         if (passedDenominationsArray.sumDenoms()>=1) {
-            for (var i = currDenom; i < allDenominationsArray.length; i++) {
+            for (var i = 0; i < allDenominationsArray.length; i++) {
+			//Denoms to give out
                 //See which denominations are left in the passed walletList
                 if (passedDenominationsArray.denominations[i].quantity>0) {
 						var copiedrecursWalletList = copyArray(passedWalletList);
@@ -575,6 +583,7 @@ var recursiveSolveSetup = function () {
 							//The assumptions here are wrong, because multiple branches will require denomination arrays that are equivalent.
 							//Will need to compare the WalletLists and bail if a WalletList is a duplicate. 10/19/20
 							if (checkTreeDupeList(passedWalletList) == false) {
+								//checkTreeDupeList(passedWalletList)
 								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
 							}
 							copyBackWalletList(passedWalletList,copiedrecursWalletList);
