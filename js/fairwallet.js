@@ -567,7 +567,7 @@ var recursiveSolveSetup = function () {
 // The issue with this recursion is it does more work than required.
 //For example, in a 3x2 situation, there are only 9 unique outcomes, but all orders are tested, so it actually does 18 calculations
 // That depend on which denomination was chosen first to work with.
-    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level,currDenom) {
+    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level) {
         if (passedDenominationsArray.sumDenoms()>=1) {
             for (var i = 0; i < allDenominationsArray.length; i++) {
 			//Denoms to give out
@@ -584,11 +584,11 @@ var recursiveSolveSetup = function () {
 							//Will need to compare the WalletLists and bail if a WalletList is a duplicate. 10/19/20
 							if (checkTreeDupeList(passedWalletList) == false) {
 								//checkTreeDupeList(passedWalletList)
-								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,i);
+								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1);
 							}
 							copyBackWalletList(passedWalletList,copiedrecursWalletList);
 							copyBackWalletSingle(passedDenominationsArray,copiedDenoms)
-							console.log("Level Count: " + level);
+							//console.log("Level Count: " + level);
 						}
                 }
 
@@ -609,7 +609,7 @@ var recursiveSolveSetup = function () {
     var stepCount = 0;
 	var remainderComparison = sumWalletDebtAbs(walletList); //Must be better than doing nothing
 	var movementComparison = Infinity;
-    recursiveSolve(walletList,storeDenoms, 0,0);
+    recursiveSolve(walletList,storeDenoms, 0);
 	copyBackWalletList(walletList,finalConfig);
 	console.log("Step Count: " + stepCount);
 };
