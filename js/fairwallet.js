@@ -443,7 +443,6 @@ var IterativeSolveSetup = function () {
 //Transfer all denominations to a temporary wallet.
 //Should have already transferred to bank first, so this is about minimizing the remaining moves.
 //Later I would like this to ignore some of the denominations that are transfered via the more efficient algorithm.
-
     var storeDenoms = new Wallet("storeDenoms");
 	var finalConfig = copyArray(walletList); // Stores original composition of wallet initially in case no changes occur
 
@@ -500,8 +499,18 @@ var recursiveSolveSetup = function () {
 		
 //Transfer all denominations to a temporary wallet.
 //Should have already transferred to bank first, so this is about minimizing the remaining moves.
-//Later I would like this to ignore some of the denominations that are transfered via the more efficient algorithm.
-    var storeDenoms = new Wallet("storeDenoms");
+//Later I would like this to ignore some of the denominations that are transferred via the more efficient algorithm.
+    var stepCount = 0;
+	var remainderComparison = sumWalletDebtAbs(walletList); //Must be better than doing Greedy Solve
+	var movementComparison = Infinity;
+	
+	//Array of wallets
+	treeStore = new Array();
+	//Array of best values per node level
+	nodeStore = new Array(sumWalletDenomCountList(walletList)).fill(Infinity);
+	
+	
+	var storeDenoms = new Wallet("storeDenoms");
 	var finalConfig = copyArray(walletList); // Stores original composition of wallet
     //Original walletList already should be backed up, so can free mess with the wallet contents before each backup.
 
@@ -514,8 +523,7 @@ var recursiveSolveSetup = function () {
     }
     //All denominations have been transferred to the storageWallet.
 	
-	//Array of wallets
-	treeStore = new Array();
+
 	
 	
 	var checkTreeDupe = function (walletToCompare) {
@@ -567,7 +575,7 @@ var recursiveSolveSetup = function () {
 // The issue with this recursion is it does more work than required.
 //For example, in a 3x2 situation, there are only 9 unique outcomes, but all orders are tested, so it actually does 18 calculations
 // That depend on which denomination was chosen first to work with.
-    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level) {
+    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level, nodeBest) {
         if (passedDenominationsArray.sumDenoms()>=1) {
             for (var i = 0; i < allDenominationsArray.length; i++) {
 			//Denoms to give out
@@ -580,12 +588,22 @@ var recursiveSolveSetup = function () {
 						for (var m=0; m<passedWalletList.length; m++) {
 							//move down the chain, and restore previous wallet list config, move denomination into position +1
 							transferDenomination(passedDenominationsArray, passedWalletList[m], allDenominationsArray[i]);
-							//The assumptions here are wrong, because multiple branches will require denomination arrays that are equivalent.
+
+							
+							var speedyTempVarWalletSum = sumWalletDebtAbs(passedWalletList)
+							if (speedyTempVarWalletSum <=nodeBest && speedyTempVarWalletSum<=nodeStore[level]  ) {
+							console.log("Old Node: " + nodeBest, level);
+							nodeStore[level] = speedyTempVarWalletSum;
+							console.log("New Node: " + nodeBest, level);
+							//Don't save the hand-out if it is worse than the node above. :( 
+
 							//Will need to compare the WalletLists and bail if a WalletList is a duplicate. 10/19/20
-							if (checkTreeDupeList(passedWalletList) == false) {
-								//checkTreeDupeList(passedWalletList)
-								recursiveSolve(passedWalletList,passedDenominationsArray, level + 1);
+								if (checkTreeDupeList(passedWalletList) == false) {
+									//checkTreeDupeList(passedWalletList)
+									recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,sumWalletDebtAbs(passedWalletList));
+								}
 							}
+							//console.log("New Best: " + remainderComparison);
 							copyBackWalletList(passedWalletList,copiedrecursWalletList);
 							copyBackWalletSingle(passedDenominationsArray,copiedDenoms)
 							//console.log("Level Count: " + level);
@@ -596,20 +614,21 @@ var recursiveSolveSetup = function () {
             }
         } else {
 			stepCount+=1;
+			console.log("Node Best: " + nodeBest, level);
             // IF there are no more denominations to move:
             //check if lower than previous lowest. If so, we want to save that wallet configuration.
             if (sumWalletDebtAbs(passedWalletList) <remainderComparison &&  compareDenomCountList(passedWalletList,walletList)<=movementComparison ) {
-                remainderComparison=sumWalletDebtAbs(passedWalletList);  //Use the remainder comparison here as the final product.
+                console.log("Old Best: " + remainderComparison);
+				remainderComparison=sumWalletDebtAbs(passedWalletList);  //Use the remainder comparison here as the final product.
                 finalConfig = copyArray(passedWalletList);
+				console.log("New Best: " + remainderComparison);
             }
             //Went through all denominations and no quantities are greater than 0, abort this branch.
             return(1);
         }
     };
-    var stepCount = 0;
-	var remainderComparison = sumWalletDebtAbs(walletList); //Must be better than doing nothing
-	var movementComparison = Infinity;
-    recursiveSolve(walletList,storeDenoms, 0);
+
+    recursiveSolve(walletList,storeDenoms, 0,Infinity);
 	copyBackWalletList(walletList,finalConfig);
 	console.log("Step Count: " + stepCount);
 };
@@ -676,6 +695,7 @@ var greedySolve = function () {
 var mainAlgorithm = function () {
 if (true) {
 //if (depthCount(walletList.length, sumWalletDenomCountList(walletList) ) <500000) {
+greedySolve();
 recursiveSolveSetup();
 console.log("Recursive");
 //console.log(depthCount(walletList.length, sumWalletDenomCountList(walletList))); 
