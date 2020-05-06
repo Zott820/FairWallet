@@ -1,5 +1,5 @@
 # FairWallet
-**tldr:** Fairwallet is a bill reconciliation tool for the post-dining experience. Code is in need of care.
+**tldr:** Fairwallet is a bill reconciliation tool for the post-dining experience. Originally an app, code is a playground for ideas.
 
 **Purpose:**
 
