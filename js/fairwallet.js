@@ -480,7 +480,7 @@ var IterativeSolveSetup = function () {
     };
 	
     var stepCount = 0;
-	var remainderComparison = sumWalletDebtAbs(walletList);
+	var remainderComparison = sumWalletDebtAbs(finalConfig); //Do better than nothing/greedy
 	var preRandWalletList = copyArray(walletList);
     var preRandDenoms = copyArray(storeDenoms);
 			for (m=0; m<1000; m++) {
@@ -694,16 +694,13 @@ var greedySolve = function () {
 
 var mainAlgorithm = function () {
 if (true) {
-//if (depthCount(walletList.length, sumWalletDenomCountList(walletList) ) <500000) {
 greedySolve();
 recursiveSolveSetup();
 console.log("Recursive");
-//console.log(depthCount(walletList.length, sumWalletDenomCountList(walletList))); 
 } else {
 	IterativeSolveSetup();
 	//greedySolve();
 	console.log("Running Main")
-	//console.log(depthCount(walletList.length, sumWalletDenomCountList(walletList))); 
 }
 };
 
@@ -907,25 +904,6 @@ sortWalletOwner(copiedWalletList);
 printTable();
 };
 
-//This depth count doesn't count correctly. It may count what it does now, but not what it should be. IE 4 bills in one wallet should only be 1 way possible, not 24.
-var depthCount = function(a,n) {
-	var tempStorage;
-	var recursive = function(a,n,last,count) {
-		if (n<=0) {
-			return 0;
-		}
-		var next = a*(count+1)*last;
-		count+=1;
-		if (count<n) {
-			recursive(a,n,next,count);
-		} else 
-			{tempStorage=next;}
-	};
-	recursive(a,n,1,0);
-	return tempStorage ;
-
-};
-	
 // Stolen from here http://tinyurl.com/stolenlink
 // This Section handles the printing of the final table
 
