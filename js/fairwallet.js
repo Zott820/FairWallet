@@ -493,13 +493,11 @@ var IterativeSolveSetup = function () {
 	copyBackWalletList(walletList,finalConfig);
 };
 
-//Recursion Attempt - Not a confirmed working method
 var recursiveSolveSetup = function () {
 		payToBank();
 		
 //Transfer all denominations to a temporary wallet.
 //Should have already transferred to bank first, so this is about minimizing the remaining moves.
-//Later I would like this to ignore some of the denominations that are transferred via the more efficient algorithm.
     var stepCount = 0;
 	var remainderComparison = sumWalletDebtAbs(walletList); //Must be better than doing Greedy Solve
 	var movementComparison = Infinity;
@@ -524,7 +522,6 @@ var recursiveSolveSetup = function () {
     //All denominations have been transferred to the storageWallet.
 	
 
-	
 	
 	var checkTreeDupe = function (walletToCompare) {
 		//Less unique denominations we're interested in are likely at the end
@@ -575,8 +572,10 @@ var recursiveSolveSetup = function () {
 // The issue with this recursion is it does more work than required.
 //For example, in a 3x2 situation, there are only 9 unique outcomes, but all orders are tested, so it actually does 18 calculations
 // That depend on which denomination was chosen first to work with.
-    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level, nodeBest) {
-        if (passedDenominationsArray.sumDenoms()>=1) {
+//Memoization attempts to alleviate this a bit.
+    var recursiveSolve = function (passedWalletList, passedDenominationsArray, level, nodeBest, initialTime) {
+		//console.log("Time Delta: " + (performance.now()-initialTime));
+		if (passedDenominationsArray.sumDenoms()>=1 && performance.now()-initialTime<7000) {
             for (var i = 0; i < allDenominationsArray.length; i++) {
 			//Denoms to give out
                 //See which denominations are left in the passed walletList
@@ -599,8 +598,7 @@ var recursiveSolveSetup = function () {
 
 							//Will need to compare the WalletLists and bail if a WalletList is a duplicate. 10/19/20
 								if (checkTreeDupeList(passedWalletList) == false) {
-									//checkTreeDupeList(passedWalletList)
-									recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,sumWalletDebtAbs(passedWalletList));
+									recursiveSolve(passedWalletList,passedDenominationsArray, level + 1,sumWalletDebtAbs(passedWalletList),initialTime);
 								}
 							}
 							//console.log("New Best: " + remainderComparison);
@@ -627,8 +625,8 @@ var recursiveSolveSetup = function () {
             return(1);
         }
     };
-
-    recursiveSolve(walletList,storeDenoms, 0,Infinity);
+	var t0 = performance.now() //For timeout purposes
+    recursiveSolve(walletList,storeDenoms, 0,Infinity, t0);
 	copyBackWalletList(walletList,finalConfig);
 	console.log("Step Count: " + stepCount);
 };
@@ -680,10 +678,42 @@ var payUnderpaid = function () {
 };
 
 var copyArray = function( toCopy ) {
-    var backupCopyString = JSON.stringify( toCopy );
-    var copied = JSON.parse( backupCopyString );
-	return (copied);
+//Don't actually need  to copy functions, only deepCopy arrays and their stored values
+//Replacing the parse stringify method with a recursive method to make this faster. 12/12/2020
+copied = clone(toCopy)
+
+return (copied);
 };
+
+
+//https://dev.to/ip127001/copying-objects-in-javascript-440b
+function clone(o) {
+    var newO, i
+
+    if (typeof o !== 'object') {
+        return o
+    }
+    if (!o) {
+        return o
+    }
+
+    if (Array.isArray(o)) {
+        newO = []
+        for (i = 0; i < o.length; i += 1) {
+            newO[i] = clone(o[i])
+        }
+        return newO
+    }
+
+    newO = {}
+    for (i in o) {
+        newO[i] = clone(o[i])
+    }
+    return newO
+}
+
+
+
 
 var greedySolve = function () {
 	payToBank();
@@ -850,25 +880,7 @@ sortWalletOwner(origin);
 		for (var counting in origin ) {
 			var originIndex = origin[counting];
 			var targetIndex = target[counting];
-			if (originIndex.walletOwner == targetIndex.walletOwner) { // Minor check for proper replacement
-				for (var unit in originIndex.denominations ) {
-					var originUnitIndex = originIndex.denominations[unit];
-					var targetUnitIndex = targetIndex.denominations[unit];
-					if (originUnitIndex.denomination == targetUnitIndex.denomination) { // Minor check for proper replacement
-						targetUnitIndex.quantity = copyArray(originUnitIndex.quantity);
-					}
-					else
-					{
-					console.log('Fail Replacement OriginIndex');
-					}
-				}
-			targetIndex.debt = copyArray(originIndex.debt);
-			targetIndex.total = copyArray(originIndex.total);
-			}
-			else
-			{
-			console.log('Fail Replacement UnitIndex');
-			}
+			copyBackWalletSingle(targetIndex, originIndex)
 		}			
 };
 
@@ -904,7 +916,7 @@ sortWalletOwner(copiedWalletList);
 printTable();
 };
 
-// Stolen from here http://tinyurl.com/stolenlink
+// Technique from here http://tinyurl.com/stolenlink
 // This Section handles the printing of the final table
 
 
